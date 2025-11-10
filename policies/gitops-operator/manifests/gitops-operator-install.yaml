@@ -1,0 +1,40 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: install-openshift-gitops-operator
+spec:
+  remediationAction: enforce
+  severity: medium
+  object-templates:
+    # Ensure namespace exists
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: openshift-gitops-operator
+
+    # Ensure OperatorGroup exists
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1
+        kind: OperatorGroup
+        metadata:
+          name: openshift-gitops-operator
+          namespace: openshift-gitops-operator
+        spec: {}
+
+    # Ensure Subscription is correct for OpenShift 4.18
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: Subscription
+        metadata:
+          name: openshift-gitops-operator
+          namespace: openshift-gitops-operator
+        spec:
+          channel: latest                     # ✅ valid for OCP 4.18
+          name: openshift-gitops-operator      # ✅ correct package name
+          source: redhat-operators
+          sourceNamespace: openshift-marketplace
+          installPlanApproval: Automatic

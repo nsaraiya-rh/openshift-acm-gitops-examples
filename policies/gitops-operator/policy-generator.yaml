@@ -1,0 +1,14 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: gitops-operator-policy-generator
+policyDefaults:
+  namespace: acm-policies
+  remediationAction: enforce
+  placement:
+    placementRulePath: placement-rule.yaml   # using PlacementRule (supported by plugin)
+policies:
+  - name: policy-gitops-operator
+    manifests:
+      - path: manifests/gitops-operator-install.yaml
+    remediationAction: enforce

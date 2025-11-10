@@ -1,0 +1,42 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-argocd-pullcontroller
+  namespace: policies
+spec:
+  disabled: false
+  remediationAction: enforce
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: argocd-pullcontroller-config
+        spec:
+          remediationAction: enforce
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: argoproj.io/v1alpha1
+                kind: ApplicationSet
+                metadata:
+                  name: cluster-pull-controller
+                  namespace: openshift-gitops
+                spec:
+                  generators:
+                    - pull:
+                        repoURL: https://github.com/nsaraiya-rh/openshift-gitops-examples.git
+                        revision: main
+                        path: clusters/{{metadata.name}}
+                  template:
+                    metadata:
+                      name: '{{metadata.name}}-apps'
+                    spec:
+                      project: default
+                      source:
+                        repoURL: https://github.com/nsaraiya-rh/openshift-gitops-examples.git
+                        targetRevision: main
+                        path: apps/{{metadata.name}}
+                      destination:
+                        server: https://kubernetes.default.svc
+                        namespace: default

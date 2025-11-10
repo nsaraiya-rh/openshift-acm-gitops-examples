@@ -1,0 +1,78 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-gitops-operator
+  namespace: acm-policies
+spec:
+  clusterSelector:
+    matchExpressions:
+    - key: name
+      operator: In
+      values:
+      - local-cluster-m3-pro
+      - local-cluster-m4-max
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-policy-gitops-operator
+  namespace: acm-policies
+placementRef:
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+  name: placement-gitops-operator
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: Policy
+  name: policy-gitops-operator
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  name: policy-gitops-operator
+  namespace: acm-policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: install-openshift-gitops-operator
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-gitops-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-gitops-operator
+              namespace: openshift-gitops-operator
+            spec: {}
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: openshift-gitops-operator
+              namespace: openshift-gitops-operator
+            spec:
+              channel: latest
+              installPlanApproval: Automatic
+              name: openshift-gitops-operator
+              source: redhat-operators
+              sourceNamespace: openshift-marketplace
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce

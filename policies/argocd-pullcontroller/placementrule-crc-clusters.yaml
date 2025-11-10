@@ -1,0 +1,13 @@
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: argo-pull-placement
+  namespace: policies
+spec:
+  clusterSelector:
+    matchExpressions:
+      - key: name
+        operator: In
+        values:
+          - local-cluster-m3-pro
+          - local-cluster-m4-max

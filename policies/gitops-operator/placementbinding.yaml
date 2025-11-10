@@ -1,0 +1,13 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-gitops-operator
+  namespace: acm-policies
+placementRef:
+  name: placement-gitops-operator
+  kind: Placement
+  apiGroup: cluster.open-cluster-management.io
+subjects:
+  - name: policy-gitops-operator
+    kind: Policy
+    apiGroup: policy.open-cluster-management.io

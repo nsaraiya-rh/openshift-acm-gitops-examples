@@ -1,0 +1,25 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyGenerator
+metadata:
+  name: argocd-pullcontroller
+placementBindingDefaults:
+  name: bind-argo-pullcontroller
+policyDefaults:
+  namespace: policies
+  remediationAction: enforce
+  complianceType: musthave
+  categories:
+    - CM Configuration Management
+  controls:
+    - CM-2 Baseline Configuration
+  standards:
+    - NIST-CSF
+placementRuleDefaults:
+  name: argo-pull-placement
+policies:
+  - name: policy-argocd-pullcontroller
+    manifests:
+      - path: policy-argocd-pullcontroller.yaml
+    remediationAction: enforce
+    placement:
+      placementRulePath: placementrule-crc-clusters.yaml
